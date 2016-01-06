@@ -14,7 +14,7 @@ namespace NTrees {
         std::vector<double> Features;
     };
 
-    using TRemap = std::function<unsigned(unsigned)>;
+    using TRemap = std::function<size_t(size_t)>;
 
     class ITrainingSet {
     public:

@@ -6,9 +6,12 @@
 // Description : Fuck this
 //============================================================================
 
+#include <ml/grid.h>
 #include <ml/training_set.h>
 #include <ml/tool.h>
 #include <util/progopt.h>
+
+#include <util/saveload.h>
 
 #include <fstream>
 #include <iostream>
@@ -27,6 +30,24 @@ int main(int argc, const char* argv[]) {
 
     cout << learn.Size() << endl;
     cout << learn.GetFeatureCount() << endl;
+
+    TGrid grid = BuildGrid(learn);
+
+    {
+        std::ofstream ofs(opts.Get("o"), std::ios_base::out | std::ios_base::binary);
+        Save(grid, ofs);
+    }
+
+    TGrid grid2;
+
+    {
+        std::ifstream ifs(opts.Get("o"), std::ios_base::in | std::ios_base::binary);
+        Load(ifs, &grid2);
+    }
+
+    cout << grid.Intervals.size() << endl;
+    cout << grid2.Intervals.size() << endl;
+    cout << (grid.Intervals == grid2.Intervals) << endl;
 
     if (opts.Has("p")) {
         Print(learn, cout);

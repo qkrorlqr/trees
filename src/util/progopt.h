@@ -20,7 +20,7 @@ namespace NUtil {
         bool Has(const std::string& k) const;
     };
 
-    class TProgOptionsException : public TBaseException {
+    class TProgOptionsException: public TBaseException {
     public:
         TProgOptionsException(const std::string& s) : TBaseException(s) {}
     };
