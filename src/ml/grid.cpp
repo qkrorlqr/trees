@@ -55,6 +55,41 @@ namespace NTrees {
     void Load(std::istream& is, TGrid* grid) {
         Load(is, &grid->Intervals);
     }
+
+    TBinFeatures BinarizeFeatures(const TGrid& grid, const TFeatures& features) {
+        if (grid.Intervals.size() != features.size()) {
+            throw TBaseException() << "feature and interval count mismatch: " << features.size() << " != " << grid.Intervals.size();
+        }
+
+        TBinFeatures binFeatures;
+        binFeatures.reserve(grid.Intervals.front().size() * grid.Intervals.size());
+
+        for (size_t f = 0; f < features.size(); ++f) {
+            bool found = false;
+
+            for (size_t bf = 0; bf < grid.Intervals[f].size(); ++bf) {
+                double right = grid.Intervals[f][bf];
+
+                if (!found && features[f] < right) {
+                    binFeatures.push_back(true);
+                } else {
+                    binFeatures.push_back(false);
+                }
+            }
+        }
+
+        return binFeatures;
+    }
+
+    TBinarizedTrainingSetImpl::TBinarizedTrainingSetImpl(const ITrainingSet& ts, const TGrid& grid) {
+        Features_.reserve(ts.Size());
+        Target_.reserve(ts.Size());
+
+        for (size_t i = 0; i < ts.Size(); ++i) {
+            Features_.push_back(BinarizeFeatures(grid, ts[i].Features));
+            Target_.push_back(ts[i].Target);
+        }
+    }
 }
 
 

@@ -7,10 +7,11 @@
 //============================================================================
 
 #include <ml/grid.h>
-#include <ml/training_set.h>
+#include <ml/oblivious_tree_learner.h>
 #include <ml/tool.h>
-#include <util/progopt.h>
+#include <ml/training_set.h>
 
+#include <util/progopt.h>
 #include <util/saveload.h>
 
 #include <fstream>
@@ -33,6 +34,30 @@ int main(int argc, const char* argv[]) {
 
     TGrid grid = BuildGrid(learn);
 
+    TBinarizedTrainingSetImpl binarizedLearn(learn, grid);
+    TObliviousTreeLearner learner(binarizedLearn);
+    TObliviousTree tree = learner.Fit();
+
+    {
+        std::ofstream ofs(opts.Get("o"), std::ios_base::out | std::ios_base::binary);
+        Save(tree, ofs);
+    }
+
+    TObliviousTree tree2;
+
+    {
+        std::ifstream ifs(opts.Get("o"), std::ios_base::in | std::ios_base::binary);
+        Load(ifs, &tree2);
+    }
+
+    cout << tree.Features.size() << endl;
+    cout << tree.Values.size() << endl;
+    cout << tree2.Features.size() << endl;
+    cout << tree2.Values.size() << endl;
+    cout << (tree.Features == tree2.Features) << endl;
+    cout << (tree.Values == tree2.Values) << endl;
+
+    /*
     {
         std::ofstream ofs(opts.Get("o"), std::ios_base::out | std::ios_base::binary);
         Save(grid, ofs);
@@ -48,6 +73,7 @@ int main(int argc, const char* argv[]) {
     cout << grid.Intervals.size() << endl;
     cout << grid2.Intervals.size() << endl;
     cout << (grid.Intervals == grid2.Intervals) << endl;
+    */
 
     if (opts.Has("p")) {
         Print(learn, cout);

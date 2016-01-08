@@ -5,13 +5,18 @@
 #include <functional>
 #include <iostream>
 #include <string>
+//#include <unordered_set>
 #include <vector>
 
 namespace NTrees {
+    using TFeatures = std::vector<double>;
+    //using TBinFeatures = std::unordered_set<size_t>;
+    using TBinFeatures = std::vector<bool>;
+
     struct TRecord {
         long ReqID;
         double Target;
-        std::vector<double> Features;
+        TFeatures Features;
     };
 
     using TRemap = std::function<size_t(size_t)>;
