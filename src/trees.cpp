@@ -6,7 +6,9 @@
 // Description : Fuck this
 //============================================================================
 
+#include <ml/boosting.h>
 #include <ml/grid.h>
+#include <ml/loss.h>
 #include <ml/oblivious_tree_learner.h>
 #include <ml/tool.h>
 #include <ml/training_set.h>
@@ -26,8 +28,10 @@ using namespace NUtil;
 int main(int argc, const char* argv[]) {
     TProgOptions opts(argc, argv);
 
-    std::ifstream fs(opts.Get("i"));
-    TTrainingSet learn(fs);
+    std::ifstream fsl(opts.Get("f"));
+    TTrainingSet learn(fsl);
+    std::ifstream fst(opts.Get("t"));
+    TTrainingSet validation(fst);
 
     cout << learn.Size() << endl;
     cout << learn.GetFeatureCount() << endl;
@@ -35,14 +39,33 @@ int main(int argc, const char* argv[]) {
     TGrid grid = BuildGrid(learn);
 
     TBinarizedTrainingSetImpl binarizedLearn(learn, grid);
+    TBinarizedTrainingSetImpl binarizedValidation(validation, grid);
+
+    cout << binarizedLearn.FeatureCount() << endl;
+
+    TBoostedLearner<TObliviousTreeLearner<>, TMse> learner(binarizedLearn, opts.Get("a", 0.01), opts.Get("i", 100));
+    learner.SetValidationSet(binarizedValidation);
+
+    auto model = learner.Fit();
+
+    {
+        std::ofstream ofs(opts.Get("o"), std::ios_base::out | std::ios_base::binary);
+        Save(model, ofs);
+    }
+
+    /*
     TObliviousTreeLearner learner(binarizedLearn);
+    learner.SetValidationSet(binarizedValidation);
+
     TObliviousTree tree = learner.Fit();
 
     {
         std::ofstream ofs(opts.Get("o"), std::ios_base::out | std::ios_base::binary);
         Save(tree, ofs);
     }
+    */
 
+    /*
     TObliviousTree tree2;
 
     {
@@ -56,6 +79,7 @@ int main(int argc, const char* argv[]) {
     cout << tree2.Values.size() << endl;
     cout << (tree.Features == tree2.Features) << endl;
     cout << (tree.Values == tree2.Values) << endl;
+    */
 
     /*
     {

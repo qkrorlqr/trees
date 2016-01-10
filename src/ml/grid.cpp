@@ -39,7 +39,10 @@ namespace NTrees {
             */
 
             for (size_t bucket = 0; bucket < 31; ++bucket) {
-                grid.Intervals[f].push_back(x[bucket * x.size() / 31]);
+                double right = x[bucket * x.size() / 31];
+                if (grid.Intervals[f].empty() || right != grid.Intervals[f].back()) {
+                    grid.Intervals[f].push_back(right);
+                }
             }
 
             grid.Intervals[f].push_back(std::numeric_limits<double>::max());

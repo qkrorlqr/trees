@@ -25,6 +25,7 @@ namespace NTrees {
         virtual size_t Size() const = 0;
         virtual const TBinFeatures& Features(size_t i) const = 0;
         virtual double Target(size_t i) const = 0;
+        virtual size_t FeatureCount() const = 0;
     };
 
     class TBinarizedTrainingSetImpl: public IBinarizedTrainingSet {
@@ -46,6 +47,10 @@ namespace NTrees {
 
         double Target(size_t i) const override {
             return Target_[i];
+        }
+
+        size_t FeatureCount() const override {
+            return Features_.size() ? Features_.front().size() : 0;
         }
     };
 
@@ -77,6 +82,10 @@ namespace NTrees {
 
         size_t Size() const override {
             return Parent.Size();
+        }
+
+        size_t FeatureCount() const override {
+            return Parent.FeatureCount();
         }
     };
 }

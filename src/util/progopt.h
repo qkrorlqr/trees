@@ -1,6 +1,7 @@
 #pragma once
 
 #include "base_exception.h"
+#include "cast.h"
 
 #include <unordered_map>
 #include <vector>
@@ -18,6 +19,17 @@ namespace NUtil {
         const std::vector<std::string>& GetUnnamedOptions() const;
         const std::string& Get(const std::string& k) const;
         bool Has(const std::string& k) const;
+
+        template <class T>
+        T Get(const std::string& k, T def) const {
+            auto it = Data.find(k);
+
+            if (it == Data.end()) {
+                return def;
+            }
+
+            return FromString<T>(it->second);
+        }
     };
 
     class TProgOptionsException: public TBaseException {
